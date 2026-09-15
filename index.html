@@ -1,15 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>CodeChat</title>
 
+
     <style>
+
         * {
             box-sizing: border-box;
         }
+
 
         body {
             margin: 0;
@@ -17,6 +26,7 @@
             background: #f0f2f5;
             color: #222;
         }
+
 
         .container {
             width: 100%;
@@ -26,6 +36,7 @@
             background: white;
         }
 
+
         .header {
             background: #075e54;
             color: white;
@@ -33,19 +44,23 @@
             text-align: center;
         }
 
+
         .header h1 {
             margin: 0;
             font-size: 28px;
         }
+
 
         .header p {
             margin: 7px 0 0;
             opacity: 0.9;
         }
 
+
         .screen {
             padding: 25px 20px;
         }
+
 
         button {
             width: 100%;
@@ -59,9 +74,11 @@
             color: white;
         }
 
+
         button:hover {
             opacity: 0.9;
         }
+
 
         input {
             width: 100%;
@@ -73,6 +90,7 @@
             text-align: center;
         }
 
+
         .code {
             font-size: 38px;
             font-weight: bold;
@@ -81,9 +99,11 @@
             margin: 25px 0;
         }
 
+
         .hidden {
             display: none;
         }
+
 
         .chat {
             height: 100vh;
@@ -91,20 +111,24 @@
             flex-direction: column;
         }
 
+
         .chat-header {
             background: #075e54;
             color: white;
             padding: 15px;
         }
 
+
         .chat-header strong {
             display: block;
             font-size: 18px;
         }
 
+
         .chat-header small {
             opacity: 0.8;
         }
+
 
         .messages {
             flex: 1;
@@ -113,23 +137,27 @@
             background: #e5ddd5;
         }
 
+
         .message {
-            max-width: 75%;
+            max-width: 78%;
             padding: 9px 12px;
             margin: 7px 0;
             border-radius: 8px;
             word-wrap: break-word;
         }
 
+
         .mine {
             margin-left: auto;
             background: #dcf8c6;
         }
 
+
         .other {
             margin-right: auto;
             background: white;
         }
+
 
         .time {
             display: block;
@@ -139,23 +167,78 @@
             margin-top: 3px;
         }
 
+
+        .chat-image {
+            display: block;
+            width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: 7px;
+            background: #eee;
+        }
+
+
+        .image-frame {
+            width: 100%;
+            height: 280px;
+            border: none;
+            border-radius: 7px;
+            display: block;
+            background: #eee;
+        }
+
+
         .send-area {
             display: flex;
+            align-items: center;
             padding: 10px;
             background: #f0f0f0;
-            gap: 8px;
+            gap: 7px;
         }
+
 
         .send-area input {
             margin: 0;
             text-align: left;
             flex: 1;
+            min-width: 0;
         }
 
+
         .send-area button {
-            width: 80px;
+            width: 70px;
             margin: 0;
+            padding: 13px 5px;
         }
+
+
+        .photo-button {
+            width: 48px !important;
+            font-size: 22px !important;
+            padding: 10px 0 !important;
+            flex-shrink: 0;
+        }
+
+
+        #imageInput {
+            display: none;
+        }
+
+
+        .upload-status {
+            position: fixed;
+            bottom: 75px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: none;
+            z-index: 1000;
+        }
+
 
         .error {
             color: red;
@@ -163,25 +246,36 @@
             margin-top: 15px;
         }
 
+
         .success {
             color: green;
             text-align: center;
             margin-top: 15px;
         }
+
     </style>
+
 </head>
+
 
 <body>
 
+
 <div class="container">
 
+
     <!-- HOME -->
+
     <div id="home">
 
         <div class="header">
+
             <h1>CodeChat</h1>
+
             <p>Chat without signup</p>
+
         </div>
+
 
         <div class="screen">
 
@@ -189,7 +283,11 @@
                 Create Chat
             </button>
 
-            <p style="text-align:center;">OR</p>
+
+            <p style="text-align:center;">
+                OR
+            </p>
+
 
             <input
                 id="joinCode"
@@ -198,22 +296,30 @@
                 placeholder="Enter 6-digit code"
             >
 
+
             <button onclick="joinChat()">
                 Join Chat
             </button>
 
+
             <p id="homeMessage"></p>
 
         </div>
+
     </div>
 
 
+
     <!-- CREATED ROOM -->
+
     <div id="roomWaiting" class="hidden">
 
         <div class="header">
+
             <h1>Your Chat Code</h1>
+
         </div>
+
 
         <div class="screen">
 
@@ -221,46 +327,93 @@
                 Share this code with the person you want to chat with.
             </p>
 
-            <div id="roomCode" class="code"></div>
 
-            <p id="waitingText" style="text-align:center;">
+            <div
+                id="roomCode"
+                class="code"
+            ></div>
+
+
+            <p
+                id="waitingText"
+                style="text-align:center;"
+            >
                 Waiting for someone to join...
             </p>
+
 
             <button onclick="copyCode()">
                 Copy Code
             </button>
+
 
             <button onclick="openChat()">
                 Open Chat
             </button>
 
         </div>
+
     </div>
 
 
+
     <!-- CHAT -->
-    <div id="chatScreen" class="hidden chat">
+
+    <div
+        id="chatScreen"
+        class="hidden chat"
+    >
 
         <div class="chat-header">
 
-            <strong>CodeChat</strong>
+            <strong>
+                CodeChat
+            </strong>
+
 
             <small>
-                Code: <span id="chatCode"></span>
+                Code:
+                <span id="chatCode"></span>
             </small>
 
         </div>
 
-        <div id="messages" class="messages"></div>
+
+        <div
+            id="messages"
+            class="messages"
+        ></div>
+
 
         <div class="send-area">
+
+
+            <!-- Hidden file input -->
+
+            <input
+                type="file"
+                id="imageInput"
+                accept="image/*"
+            >
+
+
+            <!-- Photo button -->
+
+            <button
+                class="photo-button"
+                onclick="document.getElementById('imageInput').click()"
+                title="Send picture"
+            >
+                📷
+            </button>
+
 
             <input
                 id="messageInput"
                 placeholder="Type a message..."
                 autocomplete="off"
             >
+
 
             <button onclick="sendMessage()">
                 Send
@@ -273,16 +426,37 @@
 </div>
 
 
+<div
+    id="uploadStatus"
+    class="upload-status"
+>
+    Uploading picture...
+</div>
+
+
+<!-- Hidden iframe used for Google Apps Script upload -->
+
+<iframe
+    name="uploadFrame"
+    id="uploadFrame"
+    style="display:none;"
+></iframe>
+
+
+
 <script type="module">
+
 
     import {
         initializeApp
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
+
     import {
         getAuth,
         signInAnonymously
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
 
     import {
         getDatabase,
@@ -295,29 +469,57 @@
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 
-    // ==========================================
-    // REPLACE THIS WITH YOUR FIREBASE CONFIG
-    // ==========================================
-
-     const firebaseConfig = {
-    apiKey: "AIzaSyD-7wzwPZGVPYB4yjuM00U7Vsux2CgduOE",
-    authDomain: "codechat-5b710.firebaseapp.com",
-    databaseURL: "https://codechat-5b710-default-rtdb.firebaseio.com",
-    projectId: "codechat-5b710",
-    storageBucket: "codechat-5b710.firebasestorage.app",
-    messagingSenderId: "340536786721",
-    appId: "1:340536786721:web:c4b972e2745f7bbceec860"
-  };
-
-
 
     // ==========================================
+    // FIREBASE CONFIG
+    // ==========================================
 
-    const app = initializeApp(firebaseConfig);
+    const firebaseConfig = {
 
-    const auth = getAuth(app);
+        apiKey: "AIzaSyD-7wzwPZGVPYB4yjuM00U7Vsux2CgduOE",
 
-    const db = getDatabase(app);
+        authDomain:
+            "codechat-5b710.firebaseapp.com",
+
+        databaseURL:
+            "https://codechat-5b710-default-rtdb.firebaseio.com",
+
+        projectId:
+            "codechat-5b710",
+
+        storageBucket:
+            "codechat-5b710.firebasestorage.app",
+
+        messagingSenderId:
+            "340536786721",
+
+        appId:
+            "1:340536786721:web:c4b972e2745f7bbceec860"
+
+    };
+
+
+
+    // ==========================================
+    // GOOGLE APPS SCRIPT
+    // ==========================================
+
+    const IMAGE_SERVER =
+        "https://script.google.com/macros/s/AKfycbxUSzQbvbsdSg7TJQTIlvoNKfY0zIwRrZICPx19BXHWJ8u-G_Utnps05cNrHCTTXD5r/exec";
+
+
+
+    const app =
+        initializeApp(firebaseConfig);
+
+
+    const auth =
+        getAuth(app);
+
+
+    const db =
+        getDatabase(app);
+
 
 
     let currentUser = null;
@@ -325,33 +527,50 @@
     let currentRoom = null;
 
 
-    // Anonymous login
+
+    // ==========================================
+    // ANONYMOUS LOGIN
+    // ==========================================
+
     signInAnonymously(auth)
+
         .then((result) => {
 
             currentUser = result.user;
 
-            console.log("Anonymous user:", currentUser.uid);
+            console.log(
+                "Anonymous user:",
+                currentUser.uid
+            );
 
         })
+
         .catch((error) => {
 
             console.error(error);
 
-            document.getElementById("homeMessage").innerHTML =
+            document.getElementById(
+                "homeMessage"
+            ).innerHTML =
                 "<span class='error'>Authentication failed.</span>";
 
         });
 
 
-    // Generate random 6 digit code
+
+    // ==========================================
+    // GENERATE ROOM CODE
+    // ==========================================
+
     function generateCode() {
 
         return Math.floor(
-            100000 + Math.random() * 900000
+            100000 +
+            Math.random() * 900000
         ).toString();
 
     }
+
 
 
     // ==========================================
@@ -360,75 +579,131 @@
 
     window.createChat = async function() {
 
+
         if (!currentUser) {
-            alert("Please wait a moment and try again.");
+
+            alert(
+                "Please wait a moment and try again."
+            );
+
             return;
         }
+
 
         let code;
 
         let roomExists = true;
 
+
         while (roomExists) {
 
-            code = generateCode();
+            code =
+                generateCode();
 
-            const roomRef = ref(db, "rooms/" + code);
 
-            const snapshot = await get(roomRef);
+            const roomRef =
+                ref(
+                    db,
+                    "rooms/" + code
+                );
 
-            roomExists = snapshot.exists();
+
+            const snapshot =
+                await get(roomRef);
+
+
+            roomExists =
+                snapshot.exists();
+
         }
 
 
-        const roomRef = ref(db, "rooms/" + code);
-
-        await set(roomRef, {
-
-            hostUid: currentUser.uid,
-
-            createdAt: Date.now(),
-
-            members: {
-
-                [currentUser.uid]: true
-
-            }
-
-        });
+        const roomRef =
+            ref(
+                db,
+                "rooms/" + code
+            );
 
 
-        currentRoom = code;
+        await set(
+            roomRef,
+            {
 
-        document.getElementById("home").classList.add("hidden");
+                hostUid:
+                    currentUser.uid,
 
-        document.getElementById("roomWaiting")
-            .classList.remove("hidden");
+                createdAt:
+                    Date.now(),
 
-        document.getElementById("roomCode")
-            .innerText = code;
+                members:
+                {
 
+                    [currentUser.uid]:
+                        true
 
-        // Watch room for second user
-        onValue(roomRef, (snapshot) => {
-
-            const data = snapshot.val();
-
-            if (!data || !data.members) return;
-
-            const memberCount =
-                Object.keys(data.members).length;
-
-            if (memberCount >= 2) {
-
-                document.getElementById("waitingText")
-                    .innerText = "Someone joined your chat!";
+                }
 
             }
+        );
 
-        });
+
+        currentRoom =
+            code;
+
+
+        document.getElementById(
+            "home"
+        ).classList.add("hidden");
+
+
+        document.getElementById(
+            "roomWaiting"
+        ).classList.remove("hidden");
+
+
+        document.getElementById(
+            "roomCode"
+        ).innerText =
+            code;
+
+
+
+        onValue(
+            roomRef,
+            (snapshot) => {
+
+                const data =
+                    snapshot.val();
+
+
+                if (
+                    !data ||
+                    !data.members
+                ) return;
+
+
+                const memberCount =
+                    Object.keys(
+                        data.members
+                    ).length;
+
+
+                if (
+                    memberCount >= 2
+                ) {
+
+                    document.getElementById(
+                        "waitingText"
+                    ).innerText =
+                        "Someone joined your chat!";
+
+                }
+
+            }
+        );
 
     };
+
 
 
     // ==========================================
@@ -437,85 +712,120 @@
 
     window.joinChat = async function() {
 
+
         if (!currentUser) {
 
-            alert("Please wait a moment and try again.");
+            alert(
+                "Please wait a moment and try again."
+            );
 
             return;
         }
 
 
         const code =
-            document.getElementById("joinCode")
-            .value.trim();
+            document.getElementById(
+                "joinCode"
+            ).value.trim();
 
 
-        if (!/^\d{6}$/.test(code)) {
+        if (
+            !/^\d{6}$/.test(code)
+        ) {
 
-            document.getElementById("homeMessage")
-                .innerHTML =
+            document.getElementById(
+                "homeMessage"
+            ).innerHTML =
                 "<span class='error'>Enter a valid 6-digit code.</span>";
 
             return;
         }
 
 
-        const roomRef = ref(db, "rooms/" + code);
+        const roomRef =
+            ref(
+                db,
+                "rooms/" + code
+            );
 
-        const snapshot = await get(roomRef);
+
+        const snapshot =
+            await get(roomRef);
 
 
         if (!snapshot.exists()) {
 
-            document.getElementById("homeMessage")
-                .innerHTML =
+            document.getElementById(
+                "homeMessage"
+            ).innerHTML =
                 "<span class='error'>Chat not found.</span>";
 
             return;
         }
 
 
-        const room = snapshot.val();
-
-        const members = room.members || {};
-
-        const memberIds = Object.keys(members);
+        const room =
+            snapshot.val();
 
 
-        // Already a member
-        if (members[currentUser.uid]) {
+        const members =
+            room.members || {};
 
-            currentRoom = code;
+
+        const memberIds =
+            Object.keys(members);
+
+
+
+        if (
+            members[currentUser.uid]
+        ) {
+
+            currentRoom =
+                code;
 
             openChat();
 
             return;
+
         }
 
 
-        // Maximum 2 users
-        if (memberIds.length >= 2) {
 
-            document.getElementById("homeMessage")
-                .innerHTML =
+        if (
+            memberIds.length >= 2
+        ) {
+
+            document.getElementById(
+                "homeMessage"
+            ).innerHTML =
                 "<span class='error'>This chat is already full.</span>";
 
             return;
+
         }
 
 
-        await update(roomRef, {
 
-            [`members/${currentUser.uid}`]: true
+        await update(
+            roomRef,
+            {
 
-        });
+                [`members/${currentUser.uid}`]:
+                    true
+
+            }
+        );
 
 
-        currentRoom = code;
+        currentRoom =
+            code;
+
 
         openChat();
 
     };
+
 
 
     // ==========================================
@@ -524,20 +834,30 @@
 
     window.openChat = function() {
 
-        if (!currentRoom) return;
 
-        document.getElementById("home")
-            .classList.add("hidden");
-
-        document.getElementById("roomWaiting")
-            .classList.add("hidden");
-
-        document.getElementById("chatScreen")
-            .classList.remove("hidden");
+        if (!currentRoom)
+            return;
 
 
-        document.getElementById("chatCode")
-            .innerText = currentRoom;
+        document.getElementById(
+            "home"
+        ).classList.add("hidden");
+
+
+        document.getElementById(
+            "roomWaiting"
+        ).classList.add("hidden");
+
+
+        document.getElementById(
+            "chatScreen"
+        ).classList.remove("hidden");
+
+
+        document.getElementById(
+            "chatCode"
+        ).innerText =
+            currentRoom;
 
 
         listenForMessages();
@@ -545,40 +865,66 @@
     };
 
 
+
     // ==========================================
-    // SEND MESSAGE
+    // SEND TEXT MESSAGE
     // ==========================================
 
     window.sendMessage = async function() {
 
+
         const input =
-            document.getElementById("messageInput");
+            document.getElementById(
+                "messageInput"
+            );
 
-        const text = input.value.trim();
+
+        const text =
+            input.value.trim();
 
 
-        if (!text || !currentRoom || !currentUser) {
+        if (
+            !text ||
+            !currentRoom ||
+            !currentUser
+        ) {
+
             return;
+
         }
 
 
         const messagesRef =
-            ref(db, "rooms/" + currentRoom + "/messages");
+            ref(
+                db,
+                "rooms/" +
+                currentRoom +
+                "/messages"
+            );
 
 
         const newMessage =
             push(messagesRef);
 
 
-        await set(newMessage, {
+        await set(
+            newMessage,
+            {
 
-            sender: currentUser.uid,
+                sender:
+                    currentUser.uid,
 
-            text: text,
+                type:
+                    "text",
 
-            time: Date.now()
+                text:
+                    text,
 
-        });
+                time:
+                    Date.now()
+
+            }
+        );
 
 
         input.value = "";
@@ -588,17 +934,362 @@
     };
 
 
-    // Press Enter to send
-    document.getElementById("messageInput")
-        .addEventListener("keydown", function(event) {
 
-            if (event.key === "Enter") {
+    // ==========================================
+    // IMAGE SELECTED
+    // ==========================================
 
-                sendMessage();
+    document.getElementById(
+        "imageInput"
+    ).addEventListener(
+        "change",
+        function(event) {
+
+            const file =
+                event.target.files[0];
+
+
+            if (!file)
+                return;
+
+
+            if (
+                !file.type.startsWith(
+                    "image/"
+                )
+            ) {
+
+                alert(
+                    "Please select an image."
+                );
+
+                return;
 
             }
 
-        });
+
+            uploadImage(file);
+
+
+            event.target.value = "";
+
+        }
+    );
+
+
+
+    // ==========================================
+    // UPLOAD IMAGE
+    // ==========================================
+
+    async function uploadImage(file) {
+
+
+        if (
+            !currentRoom ||
+            !currentUser
+        ) {
+
+            alert(
+                "Please open a chat first."
+            );
+
+            return;
+
+        }
+
+
+        const status =
+            document.getElementById(
+                "uploadStatus"
+            );
+
+
+        status.style.display =
+            "block";
+
+
+        status.innerText =
+            "Preparing picture...";
+
+
+        try {
+
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                function() {
+
+
+                    const dataUrl =
+                        reader.result;
+
+
+                    const base64 =
+                        dataUrl.split(
+                            ","
+                        )[1];
+
+
+                    const iframe =
+                        document.getElementById(
+                            "uploadFrame"
+                        );
+
+
+                    const form =
+                        document.createElement(
+                            "form"
+                        );
+
+
+                    form.method =
+                        "POST";
+
+
+                    form.action =
+                        IMAGE_SERVER;
+
+
+                    form.target =
+                        "uploadFrame";
+
+
+                    form.style.display =
+                        "none";
+
+
+
+                    addFormField(
+                        form,
+                        "action",
+                        "upload"
+                    );
+
+
+                    addFormField(
+                        form,
+                        "fileName",
+                        file.name
+                    );
+
+
+                    addFormField(
+                        form,
+                        "mimeType",
+                        file.type
+                    );
+
+
+                    addFormField(
+                        form,
+                        "image",
+                        base64
+                    );
+
+
+                    document.body.appendChild(
+                        form
+                    );
+
+
+                    window.imageUploadRoom =
+                        currentRoom;
+
+
+                    window.imageUploadUser =
+                        currentUser.uid;
+
+
+                    form.submit();
+
+
+                    form.remove();
+
+
+                    status.innerText =
+                        "Uploading picture...";
+
+                };
+
+
+            reader.readAsDataURL(file);
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            status.style.display =
+                "none";
+
+
+            alert(
+                "Image upload failed."
+            );
+
+        }
+
+    }
+
+
+
+    function addFormField(
+        form,
+        name,
+        value
+    ) {
+
+        const input =
+            document.createElement(
+                "input"
+            );
+
+
+        input.type =
+            "hidden";
+
+
+        input.name =
+            name;
+
+
+        input.value =
+            value;
+
+
+        form.appendChild(
+            input
+        );
+
+    }
+
+
+
+    // ==========================================
+    // RECEIVE UPLOAD RESULT
+    // ==========================================
+
+    window.addEventListener(
+        "message",
+        async function(event) {
+
+
+            if (
+                !event.data ||
+                typeof event.data !== "string"
+            ) {
+
+                return;
+
+            }
+
+
+            let result;
+
+
+            try {
+
+                result =
+                    JSON.parse(
+                        event.data
+                    );
+
+            } catch {
+
+                return;
+
+            }
+
+
+            if (
+                !result.success
+            ) {
+
+                document.getElementById(
+                    "uploadStatus"
+                ).style.display =
+                    "none";
+
+
+                alert(
+                    "Image upload failed: " +
+                    result.value
+                );
+
+
+                return;
+
+            }
+
+
+            const fileId =
+                result.value;
+
+
+            const room =
+                window.imageUploadRoom;
+
+
+            const user =
+                window.imageUploadUser;
+
+
+            if (
+                !room ||
+                !user ||
+                !fileId
+            ) {
+
+                return;
+
+            }
+
+
+            const messagesRef =
+                ref(
+                    db,
+                    "rooms/" +
+                    room +
+                    "/messages"
+                );
+
+
+            const newMessage =
+                push(messagesRef);
+
+
+            await set(
+                newMessage,
+                {
+
+                    sender:
+                        user,
+
+                    type:
+                        "image",
+
+                    fileId:
+                        fileId,
+
+                    time:
+                        Date.now()
+
+                }
+            );
+
+
+            document.getElementById(
+                "uploadStatus"
+            ).style.display =
+                "none";
+
+        }
+    );
+
 
 
     // ==========================================
@@ -607,75 +1298,197 @@
 
     function listenForMessages() {
 
+
         const messagesRef =
-            ref(db, "rooms/" + currentRoom + "/messages");
+            ref(
+                db,
+                "rooms/" +
+                currentRoom +
+                "/messages"
+            );
 
 
-        onValue(messagesRef, (snapshot) => {
-
-            const messages =
-                document.getElementById("messages");
-
-            messages.innerHTML = "";
+        onValue(
+            messagesRef,
+            (snapshot) => {
 
 
-            snapshot.forEach((child) => {
-
-                const data = child.val();
-
-
-                const div =
-                    document.createElement("div");
+                const messages =
+                    document.getElementById(
+                        "messages"
+                    );
 
 
-                div.classList.add("message");
+                messages.innerHTML =
+                    "";
 
 
-                if (data.sender === currentUser.uid) {
-
-                    div.classList.add("mine");
-
-                } else {
-
-                    div.classList.add("other");
-
-                }
+                snapshot.forEach(
+                    (child) => {
 
 
-                const text =
-                    document.createElement("div");
-
-                text.innerText = data.text;
+                        const data =
+                            child.val();
 
 
-                const time =
-                    document.createElement("span");
-
-                time.classList.add("time");
-
-                time.innerText =
-                    new Date(data.time)
-                    .toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit"
-                    });
+                        const div =
+                            document.createElement(
+                                "div"
+                            );
 
 
-                div.appendChild(text);
-
-                div.appendChild(time);
-
-                messages.appendChild(div);
-
-            });
+                        div.classList.add(
+                            "message"
+                        );
 
 
-            messages.scrollTop =
-                messages.scrollHeight;
+                        if (
+                            data.sender ===
+                            currentUser.uid
+                        ) {
 
-        });
+                            div.classList.add(
+                                "mine"
+                            );
+
+                        } else {
+
+                            div.classList.add(
+                                "other"
+                            );
+
+                        }
+
+
+
+                        if (
+                            data.type ===
+                            "image"
+                        ) {
+
+
+                            const frame =
+                                document.createElement(
+                                    "iframe"
+                                );
+
+
+                            frame.className =
+                                "image-frame";
+
+
+                            frame.loading =
+                                "lazy";
+
+
+                            frame.src =
+                                IMAGE_SERVER +
+                                "?fileId=" +
+                                encodeURIComponent(
+                                    data.fileId
+                                );
+
+
+                            frame.title =
+                                "Shared picture";
+
+
+                            div.appendChild(
+                                frame
+                            );
+
+
+                        } else {
+
+
+                            const text =
+                                document.createElement(
+                                    "div"
+                                );
+
+
+                            text.innerText =
+                                data.text || "";
+
+
+                            div.appendChild(
+                                text
+                            );
+
+                        }
+
+
+
+                        const time =
+                            document.createElement(
+                                "span"
+                            );
+
+
+                        time.classList.add(
+                            "time"
+                        );
+
+
+                        time.innerText =
+                            new Date(
+                                data.time
+                            ).toLocaleTimeString(
+                                [],
+                                {
+                                    hour:
+                                        "2-digit",
+
+                                    minute:
+                                        "2-digit"
+                                }
+                            );
+
+
+                        div.appendChild(
+                            time
+                        );
+
+
+                        messages.appendChild(
+                            div
+                        );
+
+                    }
+                );
+
+
+                messages.scrollTop =
+                    messages.scrollHeight;
+
+            }
+        );
 
     }
+
+
+
+    // ==========================================
+    // ENTER KEY
+    // ==========================================
+
+    document.getElementById(
+        "messageInput"
+    ).addEventListener(
+        "keydown",
+        function(event) {
+
+            if (
+                event.key === "Enter"
+            ) {
+
+                sendMessage();
+
+            }
+
+        }
+    );
+
 
 
     // ==========================================
@@ -684,13 +1497,22 @@
 
     window.copyCode = function() {
 
-        navigator.clipboard.writeText(currentRoom);
 
-        alert("Code copied!");
+        navigator.clipboard.writeText(
+            currentRoom
+        );
+
+
+        alert(
+            "Code copied!"
+        );
 
     };
 
+
 </script>
 
+
 </body>
+
 </html>
