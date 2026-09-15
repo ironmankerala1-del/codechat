@@ -984,188 +984,98 @@
 
     async function uploadImage(file) {
 
-
-        if (
-            !currentRoom ||
-            !currentUser
-        ) {
-
-            alert(
-                "Please open a chat first."
-            );
-
-            return;
-
-        }
-
-
-        const status =
-            document.getElementById(
-                "uploadStatus"
-            );
-
-
-        status.style.display =
-            "block";
-
-
-        status.innerText =
-            "Preparing picture...";
-
-
-        try {
-
-
-            const reader =
-                new FileReader();
-
-
-            reader.onload =
-                function() {
-
-
-                    const dataUrl =
-                        reader.result;
-
-
-                    const base64 =
-                        dataUrl.split(
-                            ","
-                        )[1];
-
-
-                    const iframe =
-                        document.getElementById(
-                            "uploadFrame"
-                        );
-
-
-                    const form =
-                        document.createElement(
-                            "form"
-                        );
-
-
-                    form.method =
-                        "POST";
-
-
-                    form.action =
-                        IMAGE_SERVER;
-
-
-                    form.target =
-                        "uploadFrame";
-
-
-                    form.style.display =
-                        "none";
-
-
-
-                    addFormField(
-                        form,
-                        "action",
-                        "upload"
-                    );
-
-
-                    addFormField(
-                        form,
-                        "fileName",
-                        file.name
-                    );
-
-
-                    addFormField(
-                        form,
-                        "mimeType",
-                        file.type
-                    );
-
-
-                    addFormField(
-                        form,
-                        "image",
-                        base64
-                    );
-
-
-                    document.body.appendChild(
-                        form
-                    );
-
-
-                    window.imageUploadRoom =
-                        currentRoom;
-
-
-                    window.imageUploadUser =
-                        currentUser.uid;
-
-
-                    form.submit();
-
-
-                    form.remove();
-
-
-                    status.innerText =
-                        "Uploading picture...";
-
-                };
-
-
-            reader.readAsDataURL(file);
-
-
-        } catch (error) {
-
-            console.error(error);
-
-            status.style.display =
-                "none";
-
-
-            alert(
-                "Image upload failed."
-            );
-
-        }
-
+    if (!currentRoom || !currentUser) {
+        alert("Please open a chat first.");
+        return;
     }
 
+    const status =
+        document.getElementById("uploadStatus");
 
+    status.style.display = "block";
+    status.innerText = "Uploading picture...";
 
-    function addFormField(
-        form,
-        name,
-        value
-    ) {
+    try {
 
-        const input =
-            document.createElement(
-                "input"
+        const reader = new FileReader();
+
+        reader.onload = function () {
+
+            const dataUrl = reader.result;
+
+            const base64 =
+                dataUrl.split(",")[1];
+
+            const form =
+                document.createElement("form");
+
+            form.method = "POST";
+            form.action = IMAGE_SERVER;
+            form.target = "uploadFrame";
+            form.style.display = "none";
+
+            addFormField(
+                form,
+                "action",
+                "upload"
             );
 
+            addFormField(
+                form,
+                "fileName",
+                file.name
+            );
 
-        input.type =
-            "hidden";
+            addFormField(
+                form,
+                "mimeType",
+                file.type
+            );
 
+            addFormField(
+                form,
+                "image",
+                base64
+            );
 
-        input.name =
-            name;
+            window.imageUploadRoom =
+                currentRoom;
 
+            window.imageUploadUser =
+                currentUser.uid;
 
-        input.value =
-            value;
+            document.body.appendChild(form);
 
+            form.submit();
 
-        form.appendChild(
-            input
+            setTimeout(function () {
+                form.remove();
+            }, 1000);
+
+        };
+
+        reader.onerror = function () {
+
+            status.style.display = "none";
+
+            alert("Could not read the picture.");
+
+        };
+
+        reader.readAsDataURL(file);
+
+    } catch (error) {
+
+        console.error(error);
+
+        status.style.display = "none";
+
+        alert(
+            "Image upload failed: " +
+            error.message
         );
-
     }
+}
 
 
 
