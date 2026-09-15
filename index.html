@@ -1173,122 +1173,85 @@
     // RECEIVE UPLOAD RESULT
     // ==========================================
 
-    window.addEventListener(
-        "message",
-        async function(event) {
+   window.addEventListener(
+    "message",
+    async function(event) {
 
+        if (
+            !event.data ||
+            typeof event.data !== "object"
+        ) {
+            return;
+        }
 
-            if (
-                !event.data ||
-                typeof event.data !== "string"
-            ) {
+        const result = event.data;
 
-                return;
+        if (
+            result.type !== "CODECHAT_UPLOAD_RESULT"
+        ) {
+            return;
+        }
 
-            }
-
-
-            let result;
-
-
-            try {
-
-                result =
-                    JSON.parse(
-                        event.data
-                    );
-
-            } catch {
-
-                return;
-
-            }
-
-
-            if (
-                !result.success
-            ) {
-
-                document.getElementById(
-                    "uploadStatus"
-                ).style.display =
-                    "none";
-
-
-                alert(
-                    "Image upload failed: " +
-                    result.value
-                );
-
-
-                return;
-
-            }
-
-
-            const fileId =
-                result.value;
-
-
-            const room =
-                window.imageUploadRoom;
-
-
-            const user =
-                window.imageUploadUser;
-
-
-            if (
-                !room ||
-                !user ||
-                !fileId
-            ) {
-
-                return;
-
-            }
-
-
-            const messagesRef =
-                ref(
-                    db,
-                    "rooms/" +
-                    room +
-                    "/messages"
-                );
-
-
-            const newMessage =
-                push(messagesRef);
-
-
-            await set(
-                newMessage,
-                {
-
-                    sender:
-                        user,
-
-                    type:
-                        "image",
-
-                    fileId:
-                        fileId,
-
-                    time:
-                        Date.now()
-
-                }
-            );
-
+        if (!result.success) {
 
             document.getElementById(
                 "uploadStatus"
-            ).style.display =
-                "none";
+            ).style.display = "none";
 
+            alert(
+                "Image upload failed: " +
+                result.value
+            );
+
+            return;
         }
-    );
+
+        const fileId = result.value;
+
+        const room =
+            window.imageUploadRoom;
+
+        const user =
+            window.imageUploadUser;
+
+        if (
+            !room ||
+            !user ||
+            !fileId
+        ) {
+            return;
+        }
+
+        const messagesRef =
+            ref(
+                db,
+                "rooms/" +
+                room +
+                "/messages"
+            );
+
+        const newMessage =
+            push(messagesRef);
+
+        await set(
+            newMessage,
+            {
+                sender: user,
+
+                type: "image",
+
+                fileId: fileId,
+
+                time: Date.now()
+            }
+        );
+
+        document.getElementById(
+            "uploadStatus"
+        ).style.display = "none";
+
+    }
+);
 
 
 
