@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CodeChat</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            color: #222;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            margin: auto;
+            min-height: 100vh;
+            background: white;
+        }
+
+        .header {
+            background: #075e54;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .header p {
+            margin: 7px 0 0;
+            opacity: 0.9;
+        }
+
+        .screen {
+            padding: 25px 20px;
+        }
+
+        button {
+            width: 100%;
+            border: none;
+            padding: 15px;
+            margin-top: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #128c7e;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .code {
+            font-size: 38px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .chat {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: #075e54;
+            color: white;
+            padding: 15px;
+        }
+
+        .chat-header strong {
+            display: block;
+            font-size: 18px;
+        }
+
+        .chat-header small {
+            opacity: 0.8;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background: #e5ddd5;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 9px 12px;
+            margin: 7px 0;
+            border-radius: 8px;
+            word-wrap: break-word;
+        }
+
+        .mine {
+            margin-left: auto;
+            background: #dcf8c6;
+        }
+
+        .other {
+            margin-right: auto;
+            background: white;
+        }
+
+        .time {
+            display: block;
+            font-size: 10px;
+            color: #777;
+            text-align: right;
+            margin-top: 3px;
+        }
+
+        .send-area {
+            display: flex;
+            padding: 10px;
+            background: #f0f0f0;
+            gap: 8px;
+        }
+
+        .send-area input {
+            margin: 0;
+            text-align: left;
+            flex: 1;
+        }
+
+        .send-area button {
+            width: 80px;
+            margin: 0;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .success {
+            color: green;
+            text-align: center;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HOME -->
+    <div id="home">
+
+        <div class="header">
+            <h1>CodeChat</h1>
+            <p>Chat without signup</p>
+        </div>
+
+        <div class="screen">
+
+            <button onclick="createChat()">
+                Create Chat
+            </button>
+
+            <p style="text-align:center;">OR</p>
+
+            <input
+                id="joinCode"
+                maxlength="6"
+                inputmode="numeric"
+                placeholder="Enter 6-digit code"
+            >
+
+            <button onclick="joinChat()">
+                Join Chat
+            </button>
+
+            <p id="homeMessage"></p>
+
+        </div>
+    </div>
+
+
+    <!-- CREATED ROOM -->
+    <div id="roomWaiting" class="hidden">
+
+        <div class="header">
+            <h1>Your Chat Code</h1>
+        </div>
+
+        <div class="screen">
+
+            <p style="text-align:center;">
+                Share this code with the person you want to chat with.
+            </p>
+
+            <div id="roomCode" class="code"></div>
+
+            <p id="waitingText" style="text-align:center;">
+                Waiting for someone to join...
+            </p>
+
+            <button onclick="copyCode()">
+                Copy Code
+            </button>
+
+            <button onclick="openChat()">
+                Open Chat
+            </button>
+
+        </div>
+    </div>
+
+
+    <!-- CHAT -->
+    <div id="chatScreen" class="hidden chat">
+
+        <div class="chat-header">
+
+            <strong>CodeChat</strong>
+
+            <small>
+                Code: <span id="chatCode"></span>
+            </small>
+
+        </div>
+
+        <div id="messages" class="messages"></div>
+
+        <div class="send-area">
+
+            <input
+                id="messageInput"
+                placeholder="Type a message..."
+                autocomplete="off"
+            >
+
+            <button onclick="sendMessage()">
+                Send
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script type="module">
+
+    import {
+        initializeApp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+    import {
+        getAuth,
+        signInAnonymously
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    import {
+        getDatabase,
+        ref,
+        set,
+        get,
+        update,
+        push,
+        onValue
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+
+    // ==========================================
+    // REPLACE THIS WITH YOUR FIREBASE CONFIG
+    // ==========================================
+
+     const firebaseConfig = {
+    apiKey: "AIzaSyD-7wzwPZGVPYB4yjuM00U7Vsux2CgduOE",
+    authDomain: "codechat-5b710.firebaseapp.com",
+    databaseURL: "https://codechat-5b710-default-rtdb.firebaseio.com",
+    projectId: "codechat-5b710",
+    storageBucket: "codechat-5b710.firebasestorage.app",
+    messagingSenderId: "340536786721",
+    appId: "1:340536786721:web:c4b972e2745f7bbceec860"
+  };
+
+
+
+    // ==========================================
+
+    const app = initializeApp(firebaseConfig);
+
+    const auth = getAuth(app);
+
+    const db = getDatabase(app);
+
+
+    let currentUser = null;
+
+    let currentRoom = null;
+
+
+    // Anonymous login
+    signInAnonymously(auth)
+        .then((result) => {
+
+            currentUser = result.user;
+
+            console.log("Anonymous user:", currentUser.uid);
+
+        })
+        .catch((error) => {
+
+            console.error(error);
+
+            document.getElementById("homeMessage").innerHTML =
+                "<span class='error'>Authentication failed.</span>";
+
+        });
+
+
+    // Generate random 6 digit code
+    function generateCode() {
+
+        return Math.floor(
+            100000 + Math.random() * 900000
+        ).toString();
+
+    }
+
+
+    // ==========================================
+    // CREATE CHAT
+    // ==========================================
+
+    window.createChat = async function() {
+
+        if (!currentUser) {
+            alert("Please wait a moment and try again.");
+            return;
+        }
+
+        let code;
+
+        let roomExists = true;
+
+        while (roomExists) {
+
+            code = generateCode();
+
+            const roomRef = ref(db, "rooms/" + code);
+
+            const snapshot = await get(roomRef);
+
+            roomExists = snapshot.exists();
+        }
+
+
+        const roomRef = ref(db, "rooms/" + code);
+
+        await set(roomRef, {
+
+            hostUid: currentUser.uid,
+
+            createdAt: Date.now(),
+
+            members: {
+
+                [currentUser.uid]: true
+
+            }
+
+        });
+
+
+        currentRoom = code;
+
+        document.getElementById("home").classList.add("hidden");
+
+        document.getElementById("roomWaiting")
+            .classList.remove("hidden");
+
+        document.getElementById("roomCode")
+            .innerText = code;
+
+
+        // Watch room for second user
+        onValue(roomRef, (snapshot) => {
+
+            const data = snapshot.val();
+
+            if (!data || !data.members) return;
+
+            const memberCount =
+                Object.keys(data.members).length;
+
+            if (memberCount >= 2) {
+
+                document.getElementById("waitingText")
+                    .innerText = "Someone joined your chat!";
+
+            }
+
+        });
+
+    };
+
+
+    // ==========================================
+    // JOIN CHAT
+    // ==========================================
+
+    window.joinChat = async function() {
+
+        if (!currentUser) {
+
+            alert("Please wait a moment and try again.");
+
+            return;
+        }
+
+
+        const code =
+            document.getElementById("joinCode")
+            .value.trim();
+
+
+        if (!/^\d{6}$/.test(code)) {
+
+            document.getElementById("homeMessage")
+                .innerHTML =
+                "<span class='error'>Enter a valid 6-digit code.</span>";
+
+            return;
+        }
+
+
+        const roomRef = ref(db, "rooms/" + code);
+
+        const snapshot = await get(roomRef);
+
+
+        if (!snapshot.exists()) {
+
+            document.getElementById("homeMessage")
+                .innerHTML =
+                "<span class='error'>Chat not found.</span>";
+
+            return;
+        }
+
+
+        const room = snapshot.val();
+
+        const members = room.members || {};
+
+        const memberIds = Object.keys(members);
+
+
+        // Already a member
+        if (members[currentUser.uid]) {
+
+            currentRoom = code;
+
+            openChat();
+
+            return;
+        }
+
+
+        // Maximum 2 users
+        if (memberIds.length >= 2) {
+
+            document.getElementById("homeMessage")
+                .innerHTML =
+                "<span class='error'>This chat is already full.</span>";
+
+            return;
+        }
+
+
+        await update(roomRef, {
+
+            [`members/${currentUser.uid}`]: true
+
+        });
+
+
+        currentRoom = code;
+
+        openChat();
+
+    };
+
+
+    // ==========================================
+    // OPEN CHAT
+    // ==========================================
+
+    window.openChat = function() {
+
+        if (!currentRoom) return;
+
+        document.getElementById("home")
+            .classList.add("hidden");
+
+        document.getElementById("roomWaiting")
+            .classList.add("hidden");
+
+        document.getElementById("chatScreen")
+            .classList.remove("hidden");
+
+
+        document.getElementById("chatCode")
+            .innerText = currentRoom;
+
+
+        listenForMessages();
+
+    };
+
+
+    // ==========================================
+    // SEND MESSAGE
+    // ==========================================
+
+    window.sendMessage = async function() {
+
+        const input =
+            document.getElementById("messageInput");
+
+        const text = input.value.trim();
+
+
+        if (!text || !currentRoom || !currentUser) {
+            return;
+        }
+
+
+        const messagesRef =
+            ref(db, "rooms/" + currentRoom + "/messages");
+
+
+        const newMessage =
+            push(messagesRef);
+
+
+        await set(newMessage, {
+
+            sender: currentUser.uid,
+
+            text: text,
+
+            time: Date.now()
+
+        });
+
+
+        input.value = "";
+
+        input.focus();
+
+    };
+
+
+    // Press Enter to send
+    document.getElementById("messageInput")
+        .addEventListener("keydown", function(event) {
+
+            if (event.key === "Enter") {
+
+                sendMessage();
+
+            }
+
+        });
+
+
+    // ==========================================
+    // RECEIVE MESSAGES
+    // ==========================================
+
+    function listenForMessages() {
+
+        const messagesRef =
+            ref(db, "rooms/" + currentRoom + "/messages");
+
+
+        onValue(messagesRef, (snapshot) => {
+
+            const messages =
+                document.getElementById("messages");
+
+            messages.innerHTML = "";
+
+
+            snapshot.forEach((child) => {
+
+                const data = child.val();
+
+
+                const div =
+                    document.createElement("div");
+
+
+                div.classList.add("message");
+
+
+                if (data.sender === currentUser.uid) {
+
+                    div.classList.add("mine");
+
+                } else {
+
+                    div.classList.add("other");
+
+                }
+
+
+                const text =
+                    document.createElement("div");
+
+                text.innerText = data.text;
+
+
+                const time =
+                    document.createElement("span");
+
+                time.classList.add("time");
+
+                time.innerText =
+                    new Date(data.time)
+                    .toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    });
+
+
+                div.appendChild(text);
+
+                div.appendChild(time);
+
+                messages.appendChild(div);
+
+            });
+
+
+            messages.scrollTop =
+                messages.scrollHeight;
+
+        });
+
+    }
+
+
+    // ==========================================
+    // COPY CODE
+    // ==========================================
+
+    window.copyCode = function() {
+
+        navigator.clipboard.writeText(currentRoom);
+
+        alert("Code copied!");
+
+    };
+
+</script>
+
+</body>
+</html>
